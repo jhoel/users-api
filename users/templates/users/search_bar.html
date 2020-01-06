@@ -1,0 +1,23 @@
+<div class="flex">
+    <div>
+        <a class="button" href="{% url 'user-list' %}">Ver usuarios</a>
+    </div>
+    <div>
+        <input type="text" name="" id="users--keyword-search">
+    </div>
+    <div>
+        <button class="button" onclick="searchUsersByKeyword()">Buscar</button>
+    </div>
+</div>
+
+
+<script>
+
+    function searchUsersByKeyword() {
+        let keyword = document.getElementById("users--keyword-search").value;
+        if (keyword !== "") {
+            window.location.href = `/users/?search=${keyword}`;
+        }
+    }
+
+</script>
