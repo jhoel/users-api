@@ -1,6 +1,11 @@
 {% extends "users/base.html" %}
 {% block body %}
 <div class="">
+
+  {% if api_error %}
+  <div>Error cargando usuarios</div>
+  {% endif %}
+
   <table class="">
     <thead>
       <tr>

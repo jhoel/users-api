@@ -1,16 +1,22 @@
+
+import requests
+
+from core.utils import get_url
+from django.contrib.auth import get_user_model
 from django.shortcuts import render
+from django.shortcuts import render
+from django.urls import reverse_lazy
+from django.views.generic import CreateView
+from django.views.generic import DeleteView
+from django.views.generic import DetailView
+from django.views.generic import TemplateView
+from django.views.generic import UpdateView
 from rest_framework import viewsets
-from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
-from django.contrib.auth import get_user_model
-from .serializers import UserSerializer
-from django.views.generic import CreateView, DetailView, ListView, UpdateView, DeleteView
-from django.urls import reverse_lazy
-from django.shortcuts import render
-from core.utils import get_url
-import requests
+from rest_framework.views import APIView
+from users.serializers import UserSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -19,10 +25,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         keyword = self.request.query_params.get('search')
-        if keyword is not None:
-            queryset = get_user_model().objects.search_in_fields(keyword)
-        else:
-            queryset = self.queryset
+        queryset = get_user_model().objects.search_in_fields(keyword)
         return queryset
 
 
@@ -33,16 +36,21 @@ class UserListView(ListAPIView):
     template_name = 'users/list.html'
 
 
-class ProfileList(ListView):
+class ProfileList(TemplateView):
     template_name = 'users/list.html'
-    model = get_user_model()
 
     def get_context_data(self, **kwargs):
-        base_url = get_url(self.request)
-        url = '{}/users-api/'.format(base_url)
-        users_serialized = requests.get(url, params=self.request.GET).json()
         context = super().get_context_data(**kwargs)
-        context['object_list'] = users_serialized['results']
+
+        url = '{}/users-api/'.format(get_url(self.request))
+        user_api_response = requests.get(url, params=self.request.GET)
+        users_serialized = {}
+        if user_api_response:
+            users_serialized = user_api_response.json()['results']
+        else:
+            context['api_error'] = True
+
+        context['object_list'] = users_serialized
         return context
 
 

@@ -30,11 +30,15 @@ class UserManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
     def search_in_fields(self, keyword):
-        return self.filter(
-            models.Q(email__icontains=keyword) |
-            models.Q(first_name__icontains=keyword) |
-            models.Q(last_name__icontains=keyword)
-        )
+        if keyword:
+            return self.filter(
+                models.Q(email__icontains=keyword) |
+                models.Q(first_name__icontains=keyword) |
+                models.Q(last_name__icontains=keyword)
+            )
+        else:
+            return self.all()
+
 
 class User(AbstractUser):
     username = None
@@ -50,3 +54,8 @@ class User(AbstractUser):
     def get_absolute_url(self):
         return reverse('user-detail', args=[str(self.pk)])
 
+    def __str__(self):
+        return str(self.first_name + ' ' + self.last_name)
+
+    class Meta:
+        ordering = ['-id']

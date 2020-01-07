@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from rest_framework.serializers import ModelSerializer, SerializerMethodField, CharField
+from rest_framework.serializers import ModelSerializer, CharField
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
